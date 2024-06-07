@@ -1,4 +1,5 @@
 const canvas = document.getElementById("canvas1");
+
 const ctx = canvas.getContext("2d");
 canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
@@ -9,7 +10,7 @@ let particlesArray = [];
 let mouse = {
   x: null,
   y: null,
-  radius: (canvas.height / 80) * (canvas.width / 80),
+  radius: (canvas.height / 100) * (canvas.width / 100),
 };
 
 window.addEventListener("mousemove", function (event) {
@@ -53,29 +54,42 @@ class Particle {
 
     // If collision detected
     if (distance < mouse.radius + this.size) {
-      if (mouse.x < this.x && this.x < canvas.width - this.size * 10) {
-        this.x += 10;
-      }
-      if (mouse.x > this.x && this.x > this.size * 10) {
-        this.x -= 10;
-      }
-      if (mouse.y < this.y && this.y < canvas.height - this.size * 10) {
-        this.y += 10;
-      }
-      if (mouse.y > this.y && this.y > this.size * 10) {
-        this.y -= 10;
-      }
-      //   let forceDirectionX = dx / distance;
-      //   let forceDirectionY = dy / distance;
-      //   // Calculate force (change in movement due to collision)
-      //   let maxDistance = mouse.radius + this.size;
-      //   let force = (maxDistance - distance) / maxDistance;
-      //   // Limiting the force to a certain value
-      //   let maxForce = 0.5;
-      //   force = Math.min(force, maxForce) * 2; // force is always positive (Math.min
-      //   // Apply force to particle direction
-      //   this.directionX -= forceDirectionX * force;
-      //   this.directionY -= forceDirectionY * force;
+      //   if (mouse.x < this.x && this.x < canvas.width - this.size * 10) {
+      //     this.x += 10;
+      //   }
+      //   if (mouse.x > this.x && this.x > this.size * 10) {
+      //     this.x -= 10;
+      //   }
+      //   if (mouse.y < this.y && this.y < canvas.height - this.size * 10) {
+      //     this.y += 10;
+      //   }
+      //   if (mouse.y > this.y && this.y > this.size * 10) {
+      //     this.y -= 10;
+      let dx_mouse = this.x - mouse.x;
+      let dy_mouse = this.y - mouse.y;
+      let dist_mouse = Math.sqrt(dx_mouse * dx_mouse + dy_mouse * dy_mouse);
+
+      let normVec = { x: dx_mouse / dist_mouse, y: dy_mouse / dist_mouse };
+      let repulseRadius = mouse.radius;
+      let velocity = 100;
+      let repulseFactor = Math.min(
+        (1 / repulseRadius) *
+          (-1 * Math.pow(dist_mouse / repulseRadius, 2) + 1) *
+          repulseRadius *
+          velocity,
+        50
+      );
+
+      let pos = {
+        x: this.x + normVec.x * repulseFactor,
+        y: this.y + normVec.y * repulseFactor,
+      };
+
+      // Check canvas boundaries
+      if (pos.x - this.size > 0 && pos.x + this.size < canvas.width)
+        this.x = pos.x;
+      if (pos.y - this.size > 0 && pos.y + this.size < canvas.height)
+        this.y = pos.y;
     }
 
     // Move particle
@@ -91,8 +105,7 @@ class Particle {
 function init() {
   // Reset particles array
   particlesArray = [];
-  //   let numberOfParticles = (canvas.height * canvas.width) / 7000;
-  numberOfParticles = 300;
+  let numberOfParticles = (canvas.height * canvas.width) / 6000;
 
   for (let i = 0; i < numberOfParticles; i++) {
     let size = Math.random() * 5 + 1;
