@@ -168,7 +168,7 @@ window.setInterval(() => {
       radius,
     })
   );
-}, 2500);
+}, 3000);
 
 function animate() {
   window.requestAnimationFrame(animate);
@@ -203,7 +203,7 @@ function animate() {
       asteroid.position.y + asteroid.radius < 0 ||
       asteroid.position.y - asteroid.radius > innerHeight
     ) {
-      asteroid.splice(i, 1);
+      asteroids.splice(i, 1);
     }
   }
 
